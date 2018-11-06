@@ -1,0 +1,53 @@
+#
+# verify_install_ocp.yaml
+#
+---
+- hosts: localhost
+  become: yes
+  vars:
+    ##pwdfile: /etc/origin/master/htpasswd
+    pwdfile: ~/htpasswd.ocp
+    passwd: 'Welkom01'
+    users:
+      - amy
+      - andrew
+      - brian
+      - betty
+      - admin
+  tasks:
+    - name: Users are created
+      shell: "htpasswd -b {{ pwdfile }} {{ item }} {{ passwd }}"
+      with_items:
+        - "{{ users }}"
+
+- name: Create inventory hosts file
+  hosts: localhost
+  tasks:
+    - name: Create inventory hosts file
+      script: ./scripts/create_inventory.sh
+
+- name: Execute prerequisites
+  import_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml
+
+- name: Execute deploy_cluster
+  import_playbook: /usr/share/ansible/openshift-ansible/playbooks/deploy_cluster.yml
+
+- name: Verify OpenShift Cluster
+  hosts: masters[0]
+  become: yes
+  tasks:
+    - name: copy the .kube directory from master1 to bastion
+      fetch:
+        src: /root/.kube/config
+        #dest: /root/.kube/config
+        dest: ~/.kube/config
+        flat: yes
+
+- name: Verify if system Users
+  hosts: localhost
+  tasks:
+    - name: make sure you are system:admin
+      shell: oc whoami | grep system:admin
+
+    - name: grant admin to cluster-admin
+      shell: oc adm policy add-cluster-role-to-user cluster-admin admin

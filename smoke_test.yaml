@@ -1,0 +1,24 @@
+#
+# smoke_test.yaml
+#
+---
+- hosts: localhost
+  become: yes
+  vars:
+    project: smoke-test
+    app: nodejs-mongo-persistent
+  tasks:
+    - name: smoke-test project is created
+      shell: "oc new-project {{ project }}"
+
+    - name: nodejs-mongo-persistent app is deployed
+      shell: "oc new-app {{ app }} -n {{ project }}"
+
+    - name: sleep 30 seconds to create pod instead of "watch oc get pod"
+      shell: "sleep 30"
+
+    - name: curl nodejs-mongo-persistent app
+      shell: "curl -i --head $(oc get route  -n {{ project }})"
+
+    - name: delete smoke-test project
+      shell: "oc delete project {{ project }}"

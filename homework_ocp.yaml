@@ -1,0 +1,22 @@
+#
+# homework_ocp.yaml
+#
+- name: Pre install OpenShift
+  import_playbook: playbooks/pre_install_ocp.yaml
+  tags:
+    - pre_install_ocp
+
+- name: Verify and install Openshift
+  import_playbook: playbooks/verify_install_ocp.yaml
+  tags:
+    - verify_install_ocp
+
+- name: Post install OpenShift
+  import_playbook: playbooks/post_install_ocp.yaml
+  tags:
+    - post_install
+
+- name: Smoke test OpenShift
+  import_playbook: playbooks/smoke_test.yaml
+  tags:
+    - smoke_test

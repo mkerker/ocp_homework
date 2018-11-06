@@ -1,0 +1,70 @@
+#
+# pre_install_ocp.yaml
+#
+---
+- name: Become root user
+  hosts: localhost
+  become: yes
+  become_user: root
+  become_method: sudo
+
+- name: Prepare GUID environment variable across all hosts
+  hosts: all
+  tasks:
+    - name: All GUID env variable
+      shell: export GUID=`hostname | cut -d"." -f2`; echo "export GUID=$GUID" >> $HOME/.bashrc
+
+- name: Verify that all of your hosts are running
+  hosts: all
+  tasks:
+    - action: ping
+
+- name: List the repositories on all the other hosts
+  hosts: all
+  tasks:
+    - name: List all repolist
+      yum:
+        name:
+          - repolist
+        state: present
+
+- name: Examine the NFS server to see which NFS volumes are shared
+  hosts: nfs
+  tasks:
+    - name: Examine the NFS server
+      shell: exportfs
+
+- name: Install base packages
+  hosts: localhost
+  tasks:
+    - name: required packages are present
+      yum:
+        name:
+          - wget
+          - git
+          - net-tools
+          - bind-utils
+          - yum-utils
+          - iptables-services
+          - bridge-utils
+          - bash-completion
+          - kexec-tools
+          - sos
+          - psacct
+        state: present
+
+- name: Install packages and config auth
+  hosts: localhost
+  tasks:
+    - name: required packages are present
+      yum:
+        name:
+          - atomic-openshift-clients
+          - atomic-openshift-utils
+        state: present
+
+- name: Verify Installation and Configuration of Docker
+  hosts: nodes
+  tasks:
+    - name: docker restart
+      shell: systemctl restart docker
