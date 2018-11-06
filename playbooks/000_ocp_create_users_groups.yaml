@@ -3,18 +3,15 @@
 #
 ---
 ##- hosts: masters
-- hosts: localhost
-  become: yes
+- hosts: masters
   vars:
-    ##pwdfile: /etc/origin/master/htpasswd    
-    pwdfile: ~/htpasswd.ocp
+    pwdfile: /etc/origin/master/htpasswd
     passwd: 'Welkom01'
     users:
       - amy
       - andrew
       - brian
       - betty
-      - admin
   tasks:
     - name: Users are created
       shell: "htpasswd -b {{ pwdfile }} {{ item }} {{ passwd }}"

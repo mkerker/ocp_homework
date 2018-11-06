@@ -1,0 +1,69 @@
+#
+# post_install_ocp.yaml
+#
+---
+- name: Create PVs for Users
+  hosts: nfs
+  tasks:
+    - name: Shares directories are created
+      file:
+        path: "/srv/nfs/user-vols/pv{{ item }}"
+        owner: nfsnobody
+        group: nfsnobody
+        mode: 0777
+        state: directory
+      with_sequence: start=1 end=50
+
+    - name: Setup NFS shares for PVs
+      lineinfile:
+        line: "/srv/nfs/user-vols/pv{{ item }}  *(rw,root_squash)"
+        path: /etc/exports.d/openshift-pvs.exports
+        create: yes
+      with_sequence: start=1 end=50
+      notify: reload nfs
+
+  handlers:
+    - name: reload nfs
+      service:
+        name: nfs-server
+        state: reloaded
+
+- name: Create 25 definitions files for PVs 5G size
+  hosts: localhost
+  vars:
+    pv_size: 5Gi
+  tasks:
+    - name: pv templates are created
+      template:
+        src: ../templates/pv.json
+        dest: "/root/pvs/pv{{ item }}.yml"
+      with_sequence: start=1 end=25
+
+- name: Create 25 definitions files for PVs 10G size
+  hosts: localhost
+  vars:
+    pv_size: 10Gi
+  tasks:
+    - name: pv templates are created
+      template:
+        src: ../templates/pv.yml.j2
+        dest: "/root/pvs/pv{{ item }}.yml"
+      with_sequence: start=26 end=50
+
+- name: Create all PVs from definitions files
+  hosts: localhost
+  tasks:
+    - name: Creating PVs from the files
+      shell: "cat /root/pvs/* | oc create -f -"
+
+- name: Fix NFS Persistent Volume Recycling
+  hosts: nodes
+  vars:
+    ocp_version: v3.9.41
+  tasks:
+    - name: pull the recycler image
+      shell: docker pull registry.access.redhat.com/openshift3/ose-recycler:latest
+    - name: tag the recycler image for specific version
+      shell: docker tag registry.access.redhat.com/openshift3/ose-recycler:latest registry.access.redhat.com/openshift3/ose-recycler:{{ ocp_version }}
+  tags:
+    - fixnfs

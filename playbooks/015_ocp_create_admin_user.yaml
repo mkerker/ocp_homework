@@ -1,0 +1,11 @@
+#
+# ocp_create_admin_users.yaml
+#
+---
+- hosts: localhost
+  vars:
+    pwdfile: ~/htpasswd.ocp
+    passwd: 'r3dh4t1!'
+  tasks:
+    - name: Users are created
+      shell: "htpasswd -bc {{ pwdfile }} admin {{ passwd }}"

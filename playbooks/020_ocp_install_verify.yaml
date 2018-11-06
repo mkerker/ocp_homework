@@ -2,25 +2,6 @@
 # verify_install_ocp.yaml
 #
 ---
-- name: Create htpasswd file
-  hosts: localhost
-  become: yes
-  vars:
-    ##pwdfile: /etc/origin/master/htpasswd
-    pwdfile: ~/htpasswd.ocp
-    passwd: 'Welkom01'
-    users:
-      - amy
-      - andrew
-      - brian
-      - betty
-      - admin
-  tasks:
-    - name: Users are created
-      shell: "htpasswd -b {{ pwdfile }} {{ item }} {{ passwd }}"
-      with_items:
-        - "{{ users }}"
-
 - name: Create inventory hosts file
   hosts: localhost
   tasks:

@@ -1,0 +1,63 @@
+#
+# set_limitrange.yaml
+#
+---
+- name: Create limitrange
+  hosts: localhost
+  tasks:
+    - name: Current project template is downloaded
+      shell: oc adm create-bootstrap-project-template -o yaml > /tmp/template.yaml
+
+    - name: LimitRange is added to template.yaml
+      blockinfile:
+        path: /tmp/template.yaml
+        insertbefore: '^parameters:'
+        content: |
+          - apiVersion: "v1"
+            kind: "LimitRange"
+            metadata:
+              name: "ocp-homework"
+              namespace: ${PROJECT_NAME}
+            spec:
+              limits:
+              - type: Pod
+                max:
+                  cpu: 2
+                  memory: 4Gi
+                min:
+                  cpu: 10m
+                  memory: 128Mi
+              - type: Container
+                default:
+                  cpu: 1
+                  memory: 2Gi
+                defaultRequest:
+                  cpu: 50m
+                  memory: 256Mi
+                max:
+                  cpu: 2
+                  memory: 4Gi
+                min:
+                  cpu: 10m
+                  memory: 128Mi
+
+    - name: project-request template is created
+      shell: oc create -n default -f /tmp/template.yaml
+
+
+- name: Set template as default
+  hosts: masters
+  tasks:
+    - name: Default template is set
+      lineinfile:
+        path: /etc/origin/master/master-config.yaml
+        regexp: '^(\s+)projectRequestTemplate:'
+        line: '  projectRequestTemplate: "default/project-request"'
+
+    - name: OpenShift services are restarted
+      systemd:
+        name: "{{ item }}"
+        state: "restarted"
+      with_items:
+        - atomic-openshift-master-controllers.service
+        - atomic-openshift-master-api.service
