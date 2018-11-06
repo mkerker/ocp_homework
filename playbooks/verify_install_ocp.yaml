@@ -2,7 +2,8 @@
 # verify_install_ocp.yaml
 #
 ---
-- hosts: localhost
+- name: Create htpasswd file
+  hosts: localhost
   become: yes
   vars:
     ##pwdfile: /etc/origin/master/htpasswd
@@ -51,3 +52,9 @@
 
     - name: grant admin to cluster-admin
       shell: oc adm policy add-cluster-role-to-user cluster-admin admin
+
+- name: OCP Admin diagnostics
+  hosts: localhost
+  tasks:
+    - name: diagnostics the new cluster
+      shell: oc adm diagnostics
