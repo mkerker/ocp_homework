@@ -46,7 +46,7 @@
   tasks:
     - name: pv templates are created
       template:
-        src: ../templates/pv.yml.j2
+        src: ../templates/pv.yml.json
         dest: "/root/pvs/pv{{ item }}.yml"
       with_sequence: start=26 end=50
 

@@ -23,10 +23,9 @@
   hosts: all
   tasks:
     - name: List all repolist
-      yum:
-        name:
-          - repolist
-        state: present
+      shell: yum repolist
+      args:
+        warn: no
 
 - name: Examine the NFS server to see which NFS volumes are shared
   hosts: nfs
@@ -68,3 +67,12 @@
   tasks:
     - name: docker restart
       shell: systemctl restart docker
+
+- name: Create admin user 
+  hosts: localhost
+  vars:
+    pwdfile: ~/htpasswd.ocp
+    passwd: 'r3dh4t1!'
+  tasks:
+    - name: Users are created
+      shell: "htpasswd -bc {{ pwdfile }} admin {{ passwd }}"

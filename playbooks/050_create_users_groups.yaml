@@ -1,0 +1,30 @@
+#
+# create htpasswd localhost
+#
+---
+- name: Create users
+  hosts: masters
+  vars:
+    pwdfile: /etc/origin/master/htpasswd
+    passwd: 'Welkom01'
+    users:
+      - amy
+      - andrew
+      - brian
+      - betty
+  tasks:
+    - name: Users are created
+      shell: "htpasswd -b {{ pwdfile }} {{ item }} {{ passwd }}"
+      with_items:
+        - "{{ users }}"
+
+- name: Create groups
+  hosts: localhost
+  tasks:
+    - name: Groups are created and labeled
+      shell: "{{ item }}"
+      with_items:
+        - oc adm groups new alpha andrew amy; oc label group alpha client=alpha
+        - oc adm groups new beta brian betty; oc label group beta client=beta
+
+

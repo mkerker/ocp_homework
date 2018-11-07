@@ -6,7 +6,7 @@
   hosts: localhost
   tasks:
     - name: Create inventory hosts file
-      script: ./scripts/create_inventory.sh
+      script: ./scripts/generate_inventory.sh
 
 - name: Execute prerequisites
   import_playbook: /usr/share/ansible/openshift-ansible/playbooks/prerequisites.yml

@@ -14,11 +14,17 @@
     - name: nodejs-mongo-persistent app is deployed
       shell: "oc new-app {{ app }} -n {{ project }}"
 
-    - name: sleep 30 seconds to create pod instead of "watch oc get pod"
-      shell: "sleep 30"
+    - name: "Wait for nodejs-mongo-persistent to be up"
+      shell: "oc get pods -n {{ project }} | grep ^{{ app }}"
+      register: result
+      until: result.stdout.find("Running") != -1
+      retries: 5
+      delay: 10
 
     - name: curl nodejs-mongo-persistent app
-      shell: "curl -i --head $(oc get route  -n {{ project }})"
+      shell: "curl -i --head $(oc get route {{ app }} -o jsonpath='{.spec.host}' -n {{ project }})"
+      args:
+        warn: no
 
     - name: delete smoke-test project
       shell: "oc delete project {{ project }}"
