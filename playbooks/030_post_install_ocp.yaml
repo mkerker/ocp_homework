@@ -36,7 +36,7 @@
     - name: pv templates are created
       template:
         src: ../templates/pv.json
-        dest: "/root/pvs/pv{{ item }}.yml"
+        dest: "/tmp/pv{{ item }}.yml"
       with_sequence: start=1 end=25
 
 - name: Create 25 definitions files for PVs 10G size
@@ -46,15 +46,15 @@
   tasks:
     - name: pv templates are created
       template:
-        src: ../templates/pv.yml.json
-        dest: "/root/pvs/pv{{ item }}.yml"
+        src: ../templates/pv.json
+        dest: "/tmp/pv{{ item }}.yml"
       with_sequence: start=26 end=50
 
 - name: Create all PVs from definitions files
   hosts: localhost
   tasks:
     - name: Creating PVs from the files
-      shell: "cat /root/pvs/* | oc create -f -"
+      shell: "cat /tmp/pv*.yml | oc create -f -"
 
 - name: Fix NFS Persistent Volume Recycling
   hosts: nodes

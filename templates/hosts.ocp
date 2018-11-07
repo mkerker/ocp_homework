@@ -51,7 +51,7 @@ os_sdn_network_plugin_name='redhat/openshift-ovs-networkpolicy'
 ###########################################################################
 
 openshift_master_identity_providers=[{'name': 'htpasswd_auth', 'login': 'true', 'challenge': 'true', 'kind': 'HTPasswdPasswordIdentityProvider', 'filename': '/etc/origin/master/htpasswd'}]
-openshift_master_htpasswd_file=/root/ocp_advanced_deployment_homework/htpasswd.ocp
+openshift_master_htpasswd_file=~/htpasswd.ocp
 
 ###########################################################################
 ### OpenShift Router and Registry Vars

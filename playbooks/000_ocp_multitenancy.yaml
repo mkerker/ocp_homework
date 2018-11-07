@@ -16,15 +16,14 @@
 
 
 ---
+- name: Create new Projects
+  hosts: localhost
+  tasks:
+    - name: Clients projects are created
+      shell: "{{ item }}"
+      with_items:
+        - oc new-project alpha; oc patch namespace alpha -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=alpha"}}}'; oc label namespace alpha client=alpha; oc adm policy add-role-to-group edit alpha -n alpha
+        - oc new-project beta; oc patch namespace beta -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=beta"}}}'; oc label namespace beta client=beta; oc adm policy add-role-to-group edit beta -n beta
 
-   hosts: localhost
-    become: yes
-    tasks:
-      - name: Clients projects are created
-        shell: "{{ item }}"
-        with_items:
-          - oc new-project alpha; oc patch namespace alpha -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=alpha"}}}'; oc label namespace alpha client=alpha; oc adm policy add-role-to-group edit alpha -n alpha
-          - oc new-project beta; oc patch namespace beta -p '{"metadata":{"annotations":{"openshift.io/node-selector":"client=beta"}}}'; oc label namespace beta client=beta; oc adm policy add-role-to-group edit beta -n beta
-
-      - name: Projects cannot be created by users by default
-        shell: oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated system:authenticated:oauth
+    - name: Projects cannot be created by users by default
+      shell: oc adm policy remove-cluster-role-from-group self-provisioner system:authenticated system:authenticated:oauth

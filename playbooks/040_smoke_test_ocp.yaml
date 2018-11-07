@@ -15,11 +15,11 @@
       shell: "oc new-app {{ app }} -n {{ project }}"
 
     - name: "Wait for nodejs-mongo-persistent to be up"
-      shell: "oc get pods -n {{ project }} | grep ^{{ app }}"
+      shell: "oc get pods -n {{ project }} | grep -v build | grep ^{{ app }}"
       register: result
       until: result.stdout.find("Running") != -1
-      retries: 5
-      delay: 10
+      retries: 4
+      delay: 30
 
     - name: curl nodejs-mongo-persistent app
       shell: "curl -i --head $(oc get route {{ app }} -o jsonpath='{.spec.host}' -n {{ project }})"
