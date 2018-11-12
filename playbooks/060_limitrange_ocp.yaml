@@ -1,5 +1,5 @@
 #
-# set_limitrange.yaml
+# 060_limitrange_ocp.yaml
 #
 ---
 - name: Create limitrange

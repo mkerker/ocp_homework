@@ -21,11 +21,17 @@
 
 - name: List the repositories on all the other hosts
   hosts: all
+  #tasks:
+  #  - name: List all repolist
+  #    shell: yum repolist
+  #    args:
+  #      warn: no
   tasks:
-    - name: List all repolist
-      shell: yum repolist
-      args:
-        warn: no
+    - name: Check - repos
+      yum:
+        list: repolist
+      register: result
+
 
 - name: Examine the NFS server to see which NFS volumes are shared
   hosts: nfs
@@ -68,7 +74,7 @@
     - name: docker restart
       shell: systemctl restart docker
 
-- name: Create admin user 
+- name: Create admin user
   hosts: localhost
   vars:
     pwdfile: ~/htpasswd.ocp

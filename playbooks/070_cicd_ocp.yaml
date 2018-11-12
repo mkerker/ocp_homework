@@ -1,5 +1,5 @@
 #
-# cicd.yaml
+# 070_cicd_ocp.yaml
 #
 # 2.4. CICD Workflow
 
@@ -53,15 +53,6 @@
       tags:
         - perms
 
-#    - name: "Images can be pulled from {{ build_project }}"
-#      shell: "oc policy add-role-to-group system:image-puller -n {{ build_project }} system:serviceaccounts:{{ item }}"
-#      with_items:
-#        - "{{ dev_project }}"
-#        - "{{ test_project }}"
-#        - "{{ prod_project }}"
-#      tags:
-#        - perms
-
     - name: "Openshift-tasks Template and ImageStream are imported"
       shell: "{{ item }}"
       with_items:
@@ -72,14 +63,14 @@
       shell: "oc new-app openshift-tasks -n {{ build_project }}"
 
     - name: "DC is created"
-      shell: "oc create -f ../files/ot.yml -n {{ item }}; oc new-app {{ item }}/openshift-tasks -n {{ item }}"
+      shell: "oc create -f ../templates/ot.yml -n {{ item }}; oc new-app {{ item }}/openshift-tasks -n {{ item }}"
       with_items:
         - "{{ dev_project }}"
         - "{{ test_project }}"
         - "{{ prod_project }}"
 
     - name: "Jenkins pipeline is imported to {{ jenkins_project }}"
-      shell: "oc project {{ jenkins_project }}; oc create -f ../files/tasks-bc.yml"
+      shell: "oc project {{ jenkins_project }}; oc create -f ../templates/tasks-bc.yml"
 
     - name: "Jenkins pipeline {{ build_tasks }} is execeuted"
       shell: "oc start-build {{ build_tasks }} --follow"

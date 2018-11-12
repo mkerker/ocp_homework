@@ -21,7 +21,12 @@
   tags:
     - smoke_test
 
-- name: Create users and groups
-  import_playbook: playbooks/050_create_users_groups.yaml
+- name: Create limitrange
+  import_playbook: playbooks/060_limitrange_ocp.yaml
   tags:
-    - create_users_groups
+    - limitrange_ocp
+
+- name: Create cicd pipeline
+  import_playbook: playbooks/070_cicd_ocp.yaml
+  tags:
+    - cicd_ocp
